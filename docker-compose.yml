@@ -22,6 +22,7 @@ services:
       MYSQL_DATABASE: todo                     # Create the "todo" database on startup
       MYSQL_USER: app_user                     # Create an app_user for your app to use
       MYSQL_PASSWORD: ${DB_PASSWORD}          # Use the DB_PASSWORD from the .env file
+    command: --disable-io-uring=1  
     ports:
       - "3306:3306"  # Expose MariaDB port
     networks:
