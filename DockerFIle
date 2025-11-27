@@ -1,0 +1,13 @@
+# Utiliser une image de base pour le build Maven
+FROM maven:3.8.7-jdk-17 AS build
+# vos commandes de build ici
+# Image finale pour l’excution
+FROM eclipse-temurin:17-jre-alpine
+# vos commandes d’execution ici
+# tape de compilation
+mvn clean package -DskipTests
+# tape de Build Docker
+docker build -t ghcr.io/<user>/<repo>:$(git rev-parse --short HEAD) .
+# tape d’authentification et de Push Docker
+echo ${GHCR_TOKEN} | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
+docker push ghcr.io/<user>/<repo>:$(git rev-parse --short HEAD)
