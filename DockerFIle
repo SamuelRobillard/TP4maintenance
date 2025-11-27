@@ -1,13 +1,30 @@
-# Utiliser une image de base pour le build Maven
+# Étape de build avec Maven
 FROM maven:3.8.7-jdk-17 AS build
-# vos commandes de build ici
-# Image finale pour l’excution
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier le fichier pom.xml et télécharger les dépendances
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+# Copier le code source
+COPY src ./src
+
+# Compiler l'application
+RUN mvn clean package -DskipTests
+
+# Étape de déploiement avec une image légère (Java 17)
 FROM eclipse-temurin:17-jre-alpine
-# vos commandes d’execution ici
-# tape de compilation
-mvn clean package -DskipTests
-# tape de Build Docker
-docker build -t ghcr.io/<user>/<repo>:$(git rev-parse --short HEAD) .
-# tape d’authentification et de Push Docker
-echo ${GHCR_TOKEN} | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
-docker push ghcr.io/<user>/<repo>:$(git rev-parse --short HEAD)
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier le JAR compilé depuis l'étape de build
+COPY --from=build /app/target/todo-app-1.0.0.jar /app/todo-app.jar
+
+# Exposer le port de l'application
+EXPOSE 8080
+
+# Commande pour démarrer l'application
+ENTRYPOINT ["java", "-jar", "todo-app.jar"]

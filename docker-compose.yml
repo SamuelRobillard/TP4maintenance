@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: todo-app
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_PASSWORD=${DB_PASSWORD}   # This sets the DB_PASSWORD for the app service from the .env file
+      - SPRING_PROFILES_ACTIVE=dev    # Set the active Spring profile (dev in this case)
+    depends_on:
+      - db
+    networks:
+      - todo-network
+
+  db:
+    image: mariadb:latest
+    container_name: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}   # Root password for MariaDB (from .env)
+      MYSQL_DATABASE: todo                     # Create the "todo" database on startup
+      MYSQL_USER: app_user                     # Create an app_user for your app to use
+      MYSQL_PASSWORD: ${DB_PASSWORD}          # Use the DB_PASSWORD from the .env file
+    ports:
+      - "3306:3306"  # Expose MariaDB port
+    networks:
+      - todo-network
+
+networks:
+  todo-network:
+    driver: bridge
