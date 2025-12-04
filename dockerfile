@@ -1,4 +1,4 @@
-# Build stage with Maven (using the latest Maven image)
+# Build modif stage with Maven (using the latest Maven image)
 FROM maven:latest AS build
 
 # Define working directory
