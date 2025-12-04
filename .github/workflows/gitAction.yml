@@ -14,7 +14,7 @@ jobs:
 
     services:
       db:
-        image: mariadb:mariadb:10.6
+        image: mariadb:10.6
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.DB_ROOT_PASSWORD }}
           MYSQL_DATABASE: todo
@@ -27,7 +27,7 @@ jobs:
     steps:
     - name: Checkout the repository
       uses: actions/checkout@v2
-
+    - name : Wait for MariaDB
     - name: Set up JDK 17
       uses: actions/setup-java@v2
       with:
