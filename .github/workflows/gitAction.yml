@@ -44,6 +44,17 @@ jobs:
     - name: Build with Maven
       run: mvn clean package -DskipTests
 
+    - name: Wait for MariaDB to be ready
+      run: |
+        until docker exec db mysqladmin --user=root --password=${{ secrets.DB_ROOT_PASSWORD }} --host=127.0.0.1 --silent ping; do
+          echo "Waiting for MariaDB to be ready..."
+          sleep 5
+        done
+
+    - name: Run integration tests
+      run: |
+        mvn verify -DskipTests=false
+
     - name: Log in to GitHub Container Registry
       run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
@@ -55,11 +66,7 @@ jobs:
       run: |
         docker push ghcr.io/${{ github.repository_owner }}/todo-app:${{ github.sha }}
 
-    - name: Run integration tests
-      run: |
-        # Ici, vous pouvez exécuter vos tests d'intégration avec la base de données MariaDB
-        mvn verify -DskipTests=false
-
     - name: Shutdown MariaDB service
       run: |
-        docker-compose down
+        docker stop db
+        docker rm db
