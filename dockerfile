@@ -21,7 +21,7 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
 # Copy the compiled JAR from the build stage
-COPY --from=build /app/api/target/todo-app-1.0.0.jar /app/todo-app.jar
+COPY --from=build /app/api/target/todo-0.0.1-SNAPSHOT.jar /app/todo-app.jar
 
 # Expose port for the application
 EXPOSE 8080
