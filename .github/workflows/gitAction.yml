@@ -44,20 +44,20 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
 
-    - name: Wait for MariaDB to be ready
+    - name: Wait for MariaDB and ensure user ready
       run: |
         echo "Waiting for MariaDB..."
-        until mysqladmin ping -h 127.0.0.1 -P 3306 -u root --password="${{ secrets.DB_ROOT_PASSWORD }}" --silent; do
+        for i in {1..10}; do
+          mysqladmin ping -h 127.0.0.1 -u root -p"${{ secrets.DB_ROOT_PASSWORD }}" --silent && break
           echo "MariaDB not ready yet..."
           sleep 3
         done
 
-    - name: Create app_user for CI
-      run: |
-        mysql -h 127.0.0.1 -P 3306 -u root -p"${{ secrets.DB_ROOT_PASSWORD }}" -e \
-        "CREATE USER IF NOT EXISTS 'app_user'@'%' IDENTIFIED BY '${{ secrets.DB_PASSWORD }}'; \
-         GRANT ALL PRIVILEGES ON todo.* TO 'app_user'@'%'; \
-         FLUSH PRIVILEGES;"
+        echo "Creating app_user for any host..."
+        mysql -h 127.0.0.1 -u root -p"${{ secrets.DB_ROOT_PASSWORD }}" -e \
+          "CREATE USER IF NOT EXISTS 'app_user'@'%' IDENTIFIED BY '${{ secrets.DB_PASSWORD }}'; \
+           GRANT ALL PRIVILEGES ON todo.* TO 'app_user'@'%'; \
+           FLUSH PRIVILEGES;"
 
     - name: Build with Maven
       run: |
