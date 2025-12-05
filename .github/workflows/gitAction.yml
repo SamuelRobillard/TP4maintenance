@@ -44,7 +44,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
 
-    - name: Wait for MariaDB and ensure user ready
+    - name: Wait for MariaDB and create app_user
       run: |
         echo "Waiting for MariaDB..."
         for i in {1..10}; do
@@ -63,11 +63,15 @@ jobs:
       run: |
         cd src/api
         mvn clean package -DskipTests
+      env:
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
     - name: Run integration tests
       run: |
         cd src/api
         mvn verify -DskipTests=false
+      env:
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
     - name: Log in to GitHub Container Registry
       run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
