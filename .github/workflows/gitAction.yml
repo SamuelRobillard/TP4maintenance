@@ -27,11 +27,13 @@ jobs:
     steps:
     - name: Checkout the repository
       uses: actions/checkout@v3
+
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
+
     - name: Cache Maven dependencies
       uses: actions/cache@v3
       with:
@@ -41,8 +43,9 @@ jobs:
           ${{ runner.os }}-maven-
 
     - name: Build with Maven
-      cd /src/api 
-      run: mvn clean package -DskipTests
+      run: |
+        cd src/api
+        mvn clean package -DskipTests
 
     - name: Wait for MariaDB to be ready
       run: |
@@ -53,7 +56,7 @@ jobs:
 
     - name: Run integration tests
       run: |
-        cd /src/api 
+        cd src/api
         mvn verify -DskipTests=false
 
     - name: Log in to GitHub Container Registry
