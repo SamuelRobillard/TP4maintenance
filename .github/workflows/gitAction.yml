@@ -52,6 +52,13 @@ jobs:
           sleep 3
         done
 
+    - name: Create app_user for CI
+      run: |
+        mysql -h 127.0.0.1 -P 3306 -u root -p"${{ secrets.DB_ROOT_PASSWORD }}" -e \
+        "CREATE USER IF NOT EXISTS 'app_user'@'%' IDENTIFIED BY '${{ secrets.DB_PASSWORD }}'; \
+         GRANT ALL PRIVILEGES ON todo.* TO 'app_user'@'%'; \
+         FLUSH PRIVILEGES;"
+
     - name: Build with Maven
       run: |
         cd src/api
