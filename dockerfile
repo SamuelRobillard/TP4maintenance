@@ -1,5 +1,5 @@
 # Build modif stage with Maven (using the latest Maven image)
-FROM maven:latest AS build
+FROM maven:3.9.9-eclispe-temurin-23-alpine AS build
 
 # Define working directory
 WORKDIR /app
