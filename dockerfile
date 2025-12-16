@@ -15,7 +15,7 @@ COPY src/api/src ./api/src
 RUN mvn -f ./api/pom.xml clean package -DskipTests
 
 # Deployment stage with a lightweight Java 17 image
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 # Define working directory
 WORKDIR /app
